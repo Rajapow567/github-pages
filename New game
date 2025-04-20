@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test O'yini</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        #start-screen, #quiz-screen, #result-screen {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .hidden {
+            display: none;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .question {
+            margin: 20px 0;
+        }
+        .option {
+            display: block;
+            margin: 10px 0;
+        }
+        #participant-count {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        #results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="start-screen">
+        <h1>Test O'yiniga Xush Kelibsiz!</h1>
+        <p>Ismingizni kiriting:</p>
+        <input type="text" id="player-name" placeholder="Ismingiz">
+        <button onclick="startGame()">O'yinni boshlash</button>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+        <h1>Test O'yini</h1>
+        <p id="participant-count">Ishtirokchilar soni: 0</p>
+        <div id="questions"></div>
+        <button onclick="submitAnswers()">Javoblarni yuborish</button>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h1>Natijalar</h1>
+        <div id="results"></div>
+        <button onclick="restartGame()">Qayta o'ynash</button>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "O'zbekistonning poytaxti qayer?",
+                options: ["Toshkent", "Samarqand", "Buxoro", "Xiva"],
+                correct: "Toshkent"
+            },
+            {
+                question: "1+1 nechaga teng?",
+                options: ["1", "2", "3", "4"],
+                correct: "2"
+            },
+            {
+                question: "Yilning necha oyi bor?",
+                options: ["10", "11", "12", "13"],
+                correct: "12"
+            },
+            {
+                question: "Dunyodagi eng uzun daryo qaysi?",
+                options: ["Amazonka", "Nil", "Yanszi", "Missisipi"],
+                correct: "Amazonka"
+            },
+            {
+                question: "O'zbekiston qachon mustaqillik e'lon qildi?",
+                options: ["1990", "1991", "1992", "1993"],
+                correct: "1991"
+            },
+            {
+                question: "Eng katta sayyora qaysi?",
+                options: ["Yupiter", "Mars", "Yer", "Venera"],
+                correct: "Yupiter"
+            },
+            {
+                question: "Internetni kim ixtiro qildi?",
+                options: ["Bill Gates", "Tim Berners-Lee", "Steve Jobs", "Mark Zuckerberg"],
+                correct: "Tim Berners-Lee"
+            },
+            {
+                question: "O'zbekistonda eng katta viloyat qaysi?",
+                options: ["Qashqadaryo", "Navoiy", "Samarqand", "Andijon"],
+                correct: "Navoiy"
+            },
+            {
+                question: "2 x 2 nechaga teng?",
+                options: ["2", "4", "6", "8"],
+                correct: "4"
+            },
+            {
+                question: "Eng katta okean qaysi?",
+                options: ["Atlantika", "Tinch", "Hind", "Shimoliy Muz"],
+                correct: "Tinch"
+            },
+            {
+                question: "Alisher Navoiy qaysi asrda yashagan?",
+                options: ["14-asr", "15-asr", "16-asr", "17-asr"],
+                correct: "15-asr"
+            },
+            {
+                question: "Fotosintez jarayonida qanday gaz chiqariladi?",
+                options: ["Karbonat angidrid", "Azot", "Kislorod", "Vodorod"],
+                correct: "Kislorod"
+            },
+            {
+                question: "Eng baland tog' qaysi?",
+                options: ["Everest", "Kilimanjaro", "Alpomish", "Mont Blanc"],
+                correct: "Everest"
+            },
+            {
+                question: "Python dasturlash tili qachon yaratilgan?",
+                options: ["1989", "1991", "1995", "2000"],
+                correct: "1991"
+            },
+            {
+                question: "O'zbekistonda nechta viloyat bor?",
+                options: ["10", "12", "14", "16"],
+                correct: "12"
+            },
+            {
+                question: "Eng kichik qit'a qaysi?",
+                options: ["Avstraliya", "Antarktida", "Yevropa", "Osiyo"],
+                correct: "Avstraliya"
+            },
+            {
+                question: "Kimyoda H2O nimani anglatadi?",
+                options: ["Suv", "Kislorod", "Vodorod", "Oltingugurt"],
+                correct: "Suv"
+            },
+            {
+                question: "O'zbekistonda eng uzun daryo qaysi?",
+                options: ["Amudaryo", "Sirdaryo", "Zaraafshon", "Chirchiq"],
+                correct: "Amudaryo"
+            },
+            {
+                question: "Dunyodagi eng katta cho'l qaysi?",
+                options: ["Sahara", "Gobi", "Kalahari", "Antarktida"],
+                correct: "Sahara"
+            },
+            {
+                question: "Yerning yadrovi qanday moddadan iborat?",
+                options: ["Temir-nikel", "Oltingugurt", "Kvars", "Granit"],
+                correct: "Temir-nikel"
+            }
+        ];
+
+        let participants = [];
+        let currentPlayer = null;
+
+        function startGame() {
+            const playerName = document.getElementById('player-name').value.trim();
+            if (!playerName) {
+                alert("Iltimos, ismingizni kiriting!");
+                return;
+            }
+
+            currentPlayer = {
+                name: playerName,
+                answers: [],
+                score: 0,
+                time: null
+            };
+
+            participants.push(currentPlayer);
+            document.getElementById('participant-count').textContent = `Ishtirokchilar soni: ${participants.length}`;
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            displayQuestions();
+        }
+
+        function displayQuestions() {
+            const questionsDiv = document.getElementById('questions');
+            questionsDiv.innerHTML = '';
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `<p>${index + 1}. ${q.question}</p>`;
+                q.options.forEach(option => {
+                    questionDiv.innerHTML += `
+                        <label class="option">
+                            <input type="radio" name="q${index}" value="${option}"> ${option}
+                        </label>`;
+                });
+                questionsDiv.appendChild(questionDiv);
+            });
+        }
+
+        function submitAnswers() {
+            const startTime = new Date();
+            currentPlayer.time = startTime;
+
+            let score = 0;
+            questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const answer = selected ? selected.value : null;
+                currentPlayer.answers[index] = answer;
+                if (answer === q.correct) {
+                    score++;
+                }
+            });
+            currentPlayer.score = score;
+
+            document.getElementById('quiz-screen').classList.add('hidden');
+            showResults();
+        }
+
+        function showResults() {
+            document.getElementById('result-screen').classList.remove('hidden');
+            const resultsDiv = document.getElementById('results');
+
+            // Saralash: ball, vaqt bo'yicha
+            participants.sort((a, b) => {
+                if (b.score === a.score) {
+                    return a.time - b.time; // Vaqt bo'yicha oldin javob bergan
+                }
+                return b.score - a.score; // Ball bo'yicha
+            });
+
+            resultsDiv.innerHTML = '<h2>Reyting</h2>';
+            participants.forEach((p, index) => {
+                resultsDiv.innerHTML += `<p>${index + 1}-o'rin: ${p.name} - ${p.score} to'g'ri javob</p>`;
+            });
+
+            // Birinchi o'rin uchun xabar
+            if (participants.length > 0 && participants[0].score > 0) {
+                const winner = participants[0].name;
+                resultsDiv.innerHTML += `<h3>${winner}, Ты непобедимый!</h3>`;
+                resultsDiv.innerHTML += `<h3>${winner}, Ты непобедимый!</h3>`;
+                resultsDiv.innerHTML += `<h3>${winner}, Ты непобедимый!</h3>`;
+            }
+        }
+
+        function restartGame() {
+            currentPlayer = null;
+            document.getElementById('player-name').value = '';
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
